@@ -13,6 +13,7 @@ public class Client {
                         clientSocket.getInputStream()));
         String messenger = reader.readLine();
         System.out.println(messenger);
+        reader.close();
         clientSocket.close();
     }
 }
