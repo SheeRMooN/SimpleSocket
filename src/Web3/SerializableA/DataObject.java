@@ -8,25 +8,36 @@ public class DataObject extends NonSerializable implements Serializable {
     CustomObject customObject ;
     transient  String[] def = {"solo1", "solo2", "solo3"};
 
-    static class Operations{
-        public static void main(String[] args) throws IOException, ClassNotFoundException {
-            DataObject dataObject = new DataObject();
-            dataObject.setStringNon("dsaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-            File file = new File("store.bin");
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject(); //прочитать данные класса чтобы не потерять поля. при сериализации
+        out.writeObject(getStringNon());
+    }
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject(); //загрузить данные класса int i = 123,String str = "wow",transient  String[] def ...
+        setStringNon( (String)in.readObject());
+    }
 
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            ObjectOutputStream oos = new ObjectOutputStream(fileOutputStream);
+}
+ class Operations{
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+        DataObject dataObject = new DataObject();
+        dataObject.setStringNon("dsaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        System.out.println(dataObject.getStringNon());
+        File file = new File("store.bin");
 
-            oos.writeObject(dataObject);
-            oos.flush();
-            oos.close();
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        ObjectOutputStream oos = new ObjectOutputStream(fileOutputStream);
 
+        oos.writeObject(dataObject);
 
-            FileInputStream fileInputStream = new FileInputStream(file);
-            ObjectInputStream oiStream = new ObjectInputStream(fileInputStream);
-            DataObject dataSerializable = (DataObject)oiStream.readObject();
-            oiStream.close();
-            System.out.println(dataSerializable.stringNon);
-        }
+        oos.flush();
+        oos.close();
+
+        FileInputStream fileInputStream = new FileInputStream(file);
+        ObjectInputStream oiStream = new ObjectInputStream(fileInputStream);
+        DataObject dataSerializable = (DataObject)oiStream.readObject();
+
+        System.out.println(dataSerializable.getStringNon());
+        oiStream.close();
     }
 }
